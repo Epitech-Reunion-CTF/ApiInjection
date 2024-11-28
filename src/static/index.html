@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vos mots préférés</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to bottom, #74ebd5, #9face6);
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+        h1 {
+            font-size: 2.5rem;
+            color: #222;
+        }
+        form {
+            margin: 20px auto;
+            padding: 15px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            display: inline-block;
+        }
+        input[type="text"] {
+            padding: 10px;
+            font-size: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-right: 10px;
+            width: 200px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 1rem;
+            color: #fff;
+            background: #5a67d8;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #4c51bf;
+        }
+        #output {
+            margin-top: 20px;
+            padding: 10px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            font-size: 1.2rem;
+        }
+        #output.error {
+            color: red;
+        }
+    </style>
+    <script>
+       async function fetchData(route) {
+            try {
+                const response = await fetch("http://127.0.0.1:5000" + route);
+                const data = await response.json();
+                console.log(data);
+                let resu = data
+                document.getElementById('output').innerText = resu.map((item) => item).join(', ');
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                document.getElementById('output').innerText = 'Error fetching data';
+            }
+        }
+
+         async function postData(route, data) {
+            try {
+                word = "(" + data.name + ")"
+                console.log(word)
+                const response = await fetch("http://127.0.0.1:5000" + route, {
+                    method: 'POST',  // Méthode POST
+                    headers: {
+                        'Content-Type': 'application/json',  // Type de contenu JSON
+                    },
+                    body: JSON.stringify(word),  // Convertir les données en JSON
+                });
+                const result = await response.json();
+            } catch (error) {
+                console.error('Error posting data:', error);
+                document.getElementById('output').innerText = 'Error posting data';
+            }
+        }
+        
+
+        function handleFormSubmit(event) {
+            event.preventDefault();
+            const name = document.getElementById('name').value;
+            if (name) {
+                postData('/api/data', { name });
+                document.getElementById('name').value = '';
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>Vos mots préférés</h1>
+    <form id="dataForm" onsubmit="handleFormSubmit(event)">
+        <label for="name">Nom: </label>
+        <input type="text" id="name" name="name" placeholder="Entrez un mot" required>
+        <button type="submit">Envoyer</button>
+    </form>
+    <div id="output">Aucune donnée pour l'instant.</div>
+    <button onclick="fetchData('/api/data')">Voir les mots</button>
+</body>
+</html>

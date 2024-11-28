@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  web-interface:
+    build:
+      context: ./static
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"  # Redirige le port 8080 de l'hôte vers le port 80 du conteneur
+    volumes:
+      - ./static:/usr/share/nginx/html:Z  # Assurez-vous que les fichiers statiques sont montés correctement
+    restart: always
+
+  web-server:
+    build:
+      context: ./serve
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"  # Redirige le port 5000 de l'hôte vers le port 5000 du conteneur
+    volumes:
+      - ./serve:/app:Z  # Monte les fichiers backend Flask correctement
+    restart: always
+
+volumes:
+  static:
+  serve:
